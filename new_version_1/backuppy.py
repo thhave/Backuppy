@@ -8,12 +8,12 @@ import logging
 
 def set_password(raw_password):
     return salt_label + str(base64.b64encode(os.urandom(16))[:-2], 'utf-8') \
-           + base64.b64encode(str.encode(raw_password))[:-2].decode()
+           + base64.b64encode(str.encode(raw_password)).decode()
 
 
 def get_password(enc_password):
     if enc_password[0:len(salt_label)] == salt_label:
-        return base64.b64decode(str.encode(enc_password[len(salt_label) + 22:] + "==")).decode()
+        return base64.b64decode(str.encode(enc_password[len(salt_label) + 22:])).decode()
     else:
         return enc_password
 
@@ -92,12 +92,14 @@ for task_index in range(0, len(task_file_list)):
 
         with SQLBackup(server, dbName, uid, pwd) as SQL:
             SQL.backup(temp_folder)
-            with FTPSync(host, port) as sync:
-                sync.mask = ['*.7z']
-                sync.includeSubdirs = False
-                sync.connect(user, password)
-                temp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), temp_folder)
-                sync.backup([temp_path], remote_path, 1, 0, create_dir=False)
+
+        with FTPSync(host, port) as sync:
+            sync.mask = ['*.7z']
+            sync.includeSubdirs = False
+            sync.connect(user, password)
+            temp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), temp_folder)
+            sync.backup([temp_path], remote_path, 1, 0, create_dir=False)
+
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         for the_file in \
                 os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), temp_folder)):

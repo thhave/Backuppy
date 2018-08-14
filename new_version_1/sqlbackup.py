@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 import pyodbc as db
 from arc7z import Archiver
@@ -50,7 +50,7 @@ class SQLBackup:
     def backup(self, path):
         self.__connect__()
         bak_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), path,
-                                     self.db_name + '_' + str(datetime.date.today()) + '.bak')
+                                     self.db_name + '_' + str(datetime.now()) + '.bak')
         try:
             if os.path.exists(bak_file_path):
                 os.remove(bak_file_path)
